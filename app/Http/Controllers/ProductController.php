@@ -41,9 +41,19 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'detail' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        Product::create($request->all());
+        $input = $request->all();
+
+        if ($image = $request->file('image')) {
+            $destinationPath = 'images/';
+            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+            $image->move($destinationPath, $profileImage);
+            $input['image'] = "$profileImage";
+        }
+
+        Product::create($input);
 
         return redirect()->route('products.index')
                         ->with('success','Product created successfully.');
@@ -52,7 +62,7 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Product  $product
+     * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
     public function show(Product $product)
@@ -63,7 +73,7 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Product  $product
+     * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
     public function edit(Product $product)
@@ -75,25 +85,37 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
+     * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Product $product)
     {
         $request->validate([
             'name' => 'required',
-            'detail' => 'required',
+            'detail' => 'required'
         ]);
 
-        $product->update($request->all());
+        $input = $request->all();
+
+        if ($image = $request->file('image')) {
+            $destinationPath = 'images/';
+            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+            $image->move($destinationPath, $profileImage);
+            $input['image'] = "$profileImage";
+        }else{
+            unset($input['image']);
+        }
+
+        $product->update($input);
 
         return redirect()->route('products.index')
                         ->with('success','Product updated successfully');
     }
+
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Product  $product
+     * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
     public function destroy(Product $product)

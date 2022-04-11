@@ -19,3 +19,7 @@ Route::get('/', function () {
 
 Route::resource('products', ProductController::class);
 
+//php artisan make:controller ProductController --resource --model=Product;
+// php artisan make:migration create_products_table --create=products
+
+
